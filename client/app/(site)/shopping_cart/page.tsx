@@ -1,8 +1,11 @@
 "use client";
 import { createOrder } from "@/app/api/api";
+import MyComponent from "@/app/api/google";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+import {  useEffect, useState } from "react";
+
+
 
 export default function ShoppingCart() {
   const router = useRouter();
@@ -21,6 +24,7 @@ export default function ShoppingCart() {
     rate: number;
     country: string;
   }
+  const [mapLocation, setMapLocation] = useState<google.maps.LatLngLiteral | null>(null);
   const [cartItems, setCartItems] = useState<GetBurgers[] | null>(null);
   const [count, setCount] = useState(1);
   const handleChange = (event: { target: { name: string; value: string } }) => {
@@ -30,6 +34,7 @@ export default function ShoppingCart() {
       [name]: value,
     }));
   };
+
   useEffect(() => {
     const savedItems = localStorage.getItem("cartItems");
     if (savedItems) {
@@ -37,7 +42,6 @@ export default function ShoppingCart() {
       setCartItems(parsedItems);
     }
   }, []);
-
   const handleSubmit = (event: { preventDefault: () => void }) => {
     event.preventDefault();
     const itemsWithCount: any =
@@ -59,10 +63,17 @@ export default function ShoppingCart() {
     localStorage.removeItem("cartItems");
     router.push("/");
   };
+  const center = {
+    lat: -3.745,
+    lng: -38.523
+  };
   return (
     <div className="">
       <div className="grid grid-cols-2 gap-3">
         <div className="border border-x-2 border-black rounded-xl col-span-1 text-center">
+        <div className="mt-4 border border-x-2 border-black rounded-xl mx-4">
+        <MyComponent address={formData.address}/>
+        </div>
           <div className="mt-4">
             <p className="mb-1">Name:</p>
             <input
