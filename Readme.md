@@ -1,3 +1,4 @@
+npm i
 if you want to start server:
 cd server 
 npm run dev 
