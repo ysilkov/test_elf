@@ -1,9 +1,11 @@
 "use client";
 import { createOrder } from "@/app/api/api";
 import Image from "next/image";
+import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 
 export default function ShoppingCart() {
+  const router = useRouter();
   const [formData, setFormData] = useState({
     name: "",
     email: "",
@@ -55,7 +57,7 @@ export default function ShoppingCart() {
       address: "",
     });
     localStorage.removeItem("cartItems");
-    window.location.href = "/";
+    router.push("/");
   };
   return (
     <div className="">
