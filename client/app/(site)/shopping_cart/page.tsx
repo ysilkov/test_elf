@@ -63,10 +63,6 @@ export default function ShoppingCart() {
     localStorage.removeItem("cartItems");
     router.push("/");
   };
-  const center = {
-    lat: -3.745,
-    lng: -38.523
-  };
   return (
     <div className="">
       <div className="grid grid-cols-2 gap-3">

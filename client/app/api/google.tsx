@@ -23,12 +23,8 @@ export default function MyComponent(props: Props) {
   });
 
   const [map, setMap] = useState<google.maps.Map | null>(null);
-  const [markerPosition, setMarkerPosition] =
-    useState<google.maps.LatLngLiteral | null>({
-      lat: -3.745,
-      lng: -38.523,
-    });
-  const [inputAddress, setInputAddress] = useState("");
+  const [customerLocation, setCustomerLocation] =
+    useState<google.maps.LatLngLiteral | null>(null);
 
   useEffect(() => {
     if (props.address) {
@@ -36,41 +32,17 @@ export default function MyComponent(props: Props) {
       geocoder.geocode({ address: props.address }, (results, status) => {
         if (status === "OK" && results && results.length > 0) {
           const { lat, lng } = results[0].geometry.location;
-          setMarkerPosition({ lat: lat(), lng: lng() });
+          setCustomerLocation({ lat: lat(), lng: lng() });
+          map?.setCenter({ lat: lat(), lng: lng() });
         }
       });
     }
-  }, [props.address]);
-
+  }, [props.address, map]);
   const onLoad = React.useCallback(function callback(map: google.maps.Map) {
     const bounds = new window.google.maps.LatLngBounds(center);
     map.fitBounds(bounds);
     setMap(map);
   }, []);
-
-  const onMarkerDragEnd = (event: google.maps.MapMouseEvent) => {
-    const { latLng } = event;
-    if (latLng) {
-      const lat = latLng.lat();
-      const lng = latLng.lng();
-      setMarkerPosition({ lat, lng });
-    }
-  };
-  const handleAddressChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setInputAddress(event.target.value);
-  };
-  console.log(inputAddress);
-  const handleAddressSearch = () => {
-    if (inputAddress) {
-      const geocoder = new window.google.maps.Geocoder();
-      geocoder.geocode({ address: inputAddress }, (results, status) => {
-        if (status === "OK" && results && results.length > 0) {
-          const { lat, lng } = results[0].geometry.location;
-          setMarkerPosition({ lat: lat(), lng: lng() });
-        }
-      });
-    }
-  };
 
   const onUnmount = React.useCallback(function callback() {
     setMap(null);
@@ -78,15 +50,6 @@ export default function MyComponent(props: Props) {
 
   return isLoaded ? (
     <div>
-      <div>
-        <input
-          type="text"
-          value={inputAddress}
-          onChange={handleAddressChange}
-          placeholder="Enter address"
-        />
-        <button onClick={handleAddressSearch}>Search</button>
-      </div>
       <GoogleMap
         mapContainerStyle={containerStyle}
         center={center}
@@ -94,12 +57,9 @@ export default function MyComponent(props: Props) {
         onLoad={onLoad}
         onUnmount={onUnmount}
       >
-        {markerPosition && (
-          <Marker
-            position={markerPosition}
-            draggable
-            onDragEnd={onMarkerDragEnd}
-          />
+        {<Marker position={center} label={"Our shop"} />}
+        {customerLocation && (
+          <Marker position={customerLocation} label={props.address} />
         )}
       </GoogleMap>
     </div>
