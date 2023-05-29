@@ -1,4 +1,4 @@
-"use client";
+"use client"
 import { ChangeEvent, MouseEvent, useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
@@ -83,6 +83,7 @@ export default function ShoppingCart() {
         address: "",
       });
       localStorage.removeItem("cartItems");
+      localStorage.removeItem("page");
       router.push("/");
     }
   };
