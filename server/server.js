@@ -20,8 +20,8 @@ async function startApp() {
     app.listen(process.env.PORT, () =>
       console.log("SERVER STARTED ON PORT 4000")
     );
-  } catch (e) {
-    console.log(e);
+  } catch (error) {
+    console.error(error);
   }
 }
 startApp();

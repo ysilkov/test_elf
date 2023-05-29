@@ -1,10 +1,21 @@
 "use client";
+import { ChangeEvent, MouseEvent, useEffect, useRef, useState } from "react";
+import { useRouter } from "next/navigation";
+import Image from "next/image";
+import ReCAPTCHA from "react-google-recaptcha";
 import { createOrder } from "@/app/api/api";
 import MyComponent from "@/app/api/google";
-import Image from "next/image";
-import { useRouter } from "next/navigation";
-import { ChangeEvent, MouseEvent, useEffect, useRef, useState } from "react";
-import ReCAPTCHA from "react-google-recaptcha";
+
+interface GetBurgers {
+  id: string;
+  img: string;
+  name: string;
+  dsc: string;
+  price: number;
+  rate: number;
+  country: string;
+  count: number;
+}
 
 export default function ShoppingCart() {
   const router = useRouter();
@@ -14,16 +25,7 @@ export default function ShoppingCart() {
     phone: "",
     address: "",
   });
-  interface GetBurgers {
-    id: string;
-    img: string;
-    name: string;
-    dsc: string;
-    price: number;
-    rate: number;
-    country: string;
-    count: number;
-  }
+
   const [cartItems, setCartItems] = useState<GetBurgers[]>([]);
   const recaptchaRef = useRef<ReCAPTCHA | null>(null);
 

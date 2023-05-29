@@ -1,7 +1,6 @@
 "use client";
 import { useEffect, useState } from "react";
 import Image from "next/image";
-import axios from "axios";
 import { getArchive } from "@/app/api/api";
 
 interface GetBurgers {
@@ -28,7 +27,7 @@ export default function History() {
     email: "",
     phone: "",
   });
-  const [archive, setArchive] = useState<Data[]>([]);
+  const [data, setData] = useState<Data[]>([]);
 
   const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = event.target;
@@ -43,7 +42,7 @@ export default function History() {
 
     try {
       const response = await getArchive(formData.email, formData.phone);
-      setArchive(response);
+      setData(response);
     } catch (error) {
       console.error("Failed to fetch archive:", error);
     }
@@ -56,7 +55,7 @@ export default function History() {
   const fetchData = async () => {
     try {
       const response = await getArchive(formData.email, formData.phone);
-      setArchive(response);
+      setData(response);
     } catch (error) {
       console.error("Failed to fetch archive:", error);
     }
@@ -88,16 +87,19 @@ export default function History() {
               required
             />
           </div>
-          <button type="submit" className="px-3 py-2 border border-x-2 border-black rounded-xl mb-4 mx-4">
-        Submit
-      </button>
+          <button
+            type="submit"
+            className="px-3 py-2 border border-x-2 border-black rounded-xl mb-4 mx-4"
+          >
+            Submit
+          </button>
         </div>
       </form>
       <div className="border border-x-2 border-black rounded-xl col-span-1 text-center m-2">
-        {archive.map((data) => (
-          <div key={data.name}>
+        {data.map((el) => (
+          <div key={el.name}>
             <div className="flex justify-start border border-x-2 border-black rounded-xl text-center m-2">
-              {data.data.map((burger) => (
+              {el.data.map((burger) => (
                 <div key={burger.id} className="">
                   <div className="flex justify-center border border-x-2 border-black rounded-xl m-2">
                     <Image
@@ -117,8 +119,7 @@ export default function History() {
               <div className="flex items-center justify-end ml-auto mr-4">
                 <p>
                   Total price:{" "}
-                  {data.data.reduce((total, burger) => total + burger.price, 0)}{" "}
-                  $
+                  {el.data.reduce((total, burger) => total + burger.price, 0)} $
                 </p>
               </div>
             </div>
