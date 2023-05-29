@@ -23,7 +23,6 @@ export default function Home() {
     "Big Burger": false,
     "Little Burger": false,
   });
-  const [cartItems, setCartItems] = useState<GetBurgers[]>([]);
   const country = [
     "New York, NY",
     "Lynchburg, VA",
@@ -46,21 +45,19 @@ export default function Home() {
     });
   };
   useEffect(() => {
-    const savedItems = localStorage.getItem("cartItems");
-
-    if (savedItems) {
-      const parsedItems = JSON.parse(savedItems);
-      setCartItems(parsedItems);
-    }
+    localStorage.getItem("cartItems");
   }, []);
   const addToCart = (id: string) => {
     const selectedProduct = burgers.find((burger) => burger.id === id);
     if (selectedProduct) {
-      setCartItems((prevCartItems) => {
-        const updatedCartItems = [...prevCartItems, selectedProduct];
+      const cartItems = JSON.parse(localStorage.getItem("cartItems") || "[]");
+      const productExists = cartItems.some(
+        (item: { id: string }) => item.id === selectedProduct.id
+      );
+      if (!productExists) {
+        const updatedCartItems = [...cartItems, selectedProduct];
         localStorage.setItem("cartItems", JSON.stringify(updatedCartItems));
-        return updatedCartItems;
-      });
+      }
     }
   };
   return (
