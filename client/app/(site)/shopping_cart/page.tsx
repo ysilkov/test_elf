@@ -70,6 +70,9 @@ export default function ShoppingCart() {
       setMessage("reCAPTCHA verification failed");
     }
   };
+  const isFormComplete = Object.values(formData).every(
+    (value) => value.trim() !== ""
+  );
   return (
     <div className="">
       <div className="grid grid-cols-2 gap-3">
@@ -166,8 +169,13 @@ export default function ShoppingCart() {
           />
         </form>
         <button
-          className="border border-x-2 border-black rounded-xl py-1 px-8"
+          className={
+            !isFormComplete
+              ? "border border-x-2 border-black rounded-xl py-1 px-8 bg-gray-300 cursor-not-allowed"
+              : "border border-x-2 border-black rounded-xl py-1 px-8 bg-blue-500"
+          }
           onClick={(e) => handleSubmit(e)}
+          disabled={!isFormComplete}
         >
           Create order
         </button>
