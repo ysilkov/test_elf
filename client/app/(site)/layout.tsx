@@ -2,7 +2,7 @@
 import Link from "next/link";
 import "../globals.css";
 import { Inter } from "next/font/google";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -16,12 +16,18 @@ export default function RootLayout({
 }: {
   children: React.ReactNode;
 }) {
-  const [activeLink, setActiveLink] = useState("/");
+  const [activeLink, setActiveLink] = useState("");
 
   const handleLinkClick = (link: string) => {
+    localStorage.setItem("page", JSON.stringify(link));
     setActiveLink(link);
   };
-
+  useEffect(() => {
+    const storedLink = localStorage.getItem("page");
+    if (storedLink) {
+      setActiveLink(JSON.parse(storedLink));
+    }
+  }, []);
   return (
     <html lang="en">
       <body className="mx-4 py-10">

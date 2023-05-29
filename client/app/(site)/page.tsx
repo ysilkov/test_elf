@@ -4,6 +4,15 @@ import { getBurgers } from "../api/api";
 import Image from "next/image";
 
 export default function Home() {
+  interface GetBurgers {
+    id: string;
+    img: string;
+    name: string;
+    dsc: string;
+    price: number;
+    rate: number;
+    country: string;
+  }
   const [activeButton, setActiveButton] = useState<string | null>(null);
   const [buttonsDisabled, setButtonsDisabled] = useState<
     Record<string, boolean>
@@ -22,16 +31,6 @@ export default function Home() {
     "Brooklyn, NY",
     "Los Angeles, CA",
   ];
-
-  interface GetBurgers {
-    id: string;
-    img: string;
-    name: string;
-    dsc: string;
-    price: number;
-    rate: number;
-    country: string;
-  }
 
   const [burgers, setBurgers] = useState<GetBurgers[]>([]);
 

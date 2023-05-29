@@ -3,7 +3,7 @@ import { createOrder } from "@/app/api/api";
 import MyComponent from "@/app/api/google";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
-import { MouseEvent, useEffect, useRef, useState } from "react";
+import { ChangeEvent, MouseEvent, useEffect, useRef, useState } from "react";
 import ReCAPTCHA from "react-google-recaptcha";
 
 export default function ShoppingCart() {
@@ -22,24 +22,41 @@ export default function ShoppingCart() {
     price: number;
     rate: number;
     country: string;
+    count: number;
   }
-  const [cartItems, setCartItems] = useState<GetBurgers[] | null>(null);
+  const [cartItems, setCartItems] = useState<GetBurgers[]>([]);
   const recaptchaRef = useRef<ReCAPTCHA | null>(null);
-  const [message, setMessage] = useState("");
-  const [count, setCount] = useState(1);
-  const handleChange = (event: { target: { name: string; value: string } }) => {
-    const { name, value } = event.target;
-    setFormData((prevFormData) => ({
-      ...prevFormData,
-      [name]: value,
-    }));
+
+  const handleChange = (event: ChangeEvent<HTMLInputElement>) => {
+    const { name, value, id } = event.target;
+    if (name === "count") {
+      const updatedItems = cartItems?.map((item) => {
+        if (item.id === id) {
+          return {
+            ...item,
+            count: Number(value) < 1 ? 1 : Number(value),
+          };
+        }
+        return item;
+      });
+      setCartItems(updatedItems);
+    } else {
+      setFormData((prevFormData) => ({
+        ...prevFormData,
+        [name]: value,
+      }));
+    }
   };
 
   useEffect(() => {
     const savedItems = localStorage.getItem("cartItems");
     if (savedItems) {
       const parsedItems: GetBurgers[] = JSON.parse(savedItems);
-      setCartItems(parsedItems);
+      const itemsWithCount = parsedItems.map((item) => ({
+        ...item,
+        count: 1,
+      }));
+      setCartItems(itemsWithCount);
     }
   }, []);
   const handleSubmit = async (event: MouseEvent<HTMLButtonElement>) => {
@@ -47,7 +64,6 @@ export default function ShoppingCart() {
     const itemsWithCount =
       cartItems?.map((item) => ({
         ...item,
-        count: count,
         user: formData.name,
         email: formData.email,
         phone: formData.phone,
@@ -66,8 +82,6 @@ export default function ShoppingCart() {
       });
       localStorage.removeItem("cartItems");
       router.push("/");
-    } else {
-      setMessage("reCAPTCHA verification failed");
     }
   };
   const isFormComplete = Object.values(formData).every(
@@ -145,9 +159,11 @@ export default function ShoppingCart() {
                   <p>{el.name}</p>
                   <div className="">
                     <input
-                      value={count}
+                      id={el.id}
+                      value={el.count}
                       type="number"
-                      onChange={(e) => setCount(Number(e.target.value))}
+                      name="count"
+                      onChange={(e) => handleChange(e)}
                       className="text-center rounded-lg"
                     />
                   </div>
@@ -159,7 +175,8 @@ export default function ShoppingCart() {
       </div>
       <div className="flex flex-row justify-end ml-auto mr-1 mt-4">
         <p className="mr-32">
-          Total price: {cartItems?.reduce((acc, item) => acc + item.price, 0)} $
+          Total price:{" "}
+          {cartItems?.reduce((acc, item) => acc + item.price * item.count, 0)} $
         </p>
         <form className="block">
           <ReCAPTCHA
