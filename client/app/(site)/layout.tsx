@@ -16,7 +16,7 @@ export default function RootLayout({
 }: {
   children: React.ReactNode;
 }) {
-  const [activeLink, setActiveLink] = useState("");
+  const [activeLink, setActiveLink] = useState("/");
 
   const handleLinkClick = (link: string) => {
     localStorage.setItem("page", JSON.stringify(link));
