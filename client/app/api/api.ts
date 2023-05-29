@@ -13,14 +13,6 @@ export const getBurgers = async (country: string) => {
     return error;
   }
 };
-/* xport const getArchive = async () => {
-  try {
-    const response = await axios.get("http://localhost:4000/api/archiveOrder");
-    return response.data;
-  } catch (error) {
-    return error;
-  }
-}; */
 export const getArchive = async (email: string, phone: string) => {
   try {
     const response = await axios.post(
@@ -58,7 +50,7 @@ interface Data {
   country: string;
   count: number;
 }
-export const createOrder = async (itemsWithCount: Data) => {
+export const createOrder = async (itemsWithCount: Data[]) => {
   try {
     const response = await axios.post("http://localhost:4000/api/createOrder", {
       data: itemsWithCount,

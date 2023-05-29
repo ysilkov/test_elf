@@ -3,9 +3,8 @@ import { createOrder } from "@/app/api/api";
 import MyComponent from "@/app/api/google";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
-import {  useEffect, useState } from "react";
-
-
+import { MouseEvent, useEffect, useRef, useState } from "react";
+import ReCAPTCHA from "react-google-recaptcha";
 
 export default function ShoppingCart() {
   const router = useRouter();
@@ -24,8 +23,9 @@ export default function ShoppingCart() {
     rate: number;
     country: string;
   }
-  const [mapLocation, setMapLocation] = useState<google.maps.LatLngLiteral | null>(null);
   const [cartItems, setCartItems] = useState<GetBurgers[] | null>(null);
+  const recaptchaRef = useRef<ReCAPTCHA | null>(null);
+  const [message, setMessage] = useState("");
   const [count, setCount] = useState(1);
   const handleChange = (event: { target: { name: string; value: string } }) => {
     const { name, value } = event.target;
@@ -42,9 +42,9 @@ export default function ShoppingCart() {
       setCartItems(parsedItems);
     }
   }, []);
-  const handleSubmit = (event: { preventDefault: () => void }) => {
+  const handleSubmit = async (event: MouseEvent<HTMLButtonElement>) => {
     event.preventDefault();
-    const itemsWithCount: any =
+    const itemsWithCount =
       cartItems?.map((item) => ({
         ...item,
         count: count,
@@ -53,23 +53,30 @@ export default function ShoppingCart() {
         phone: formData.phone,
         address: formData.address,
       })) || [];
-    createOrder(itemsWithCount);
-    setFormData({
-      name: "",
-      email: "",
-      phone: "",
-      address: "",
-    });
-    localStorage.removeItem("cartItems");
-    router.push("/");
+
+    const token = await recaptchaRef.current?.executeAsync();
+
+    if (token) {
+      createOrder(itemsWithCount);
+      setFormData({
+        name: "",
+        email: "",
+        phone: "",
+        address: "",
+      });
+      localStorage.removeItem("cartItems");
+      router.push("/");
+    } else {
+      setMessage("reCAPTCHA verification failed");
+    }
   };
   return (
     <div className="">
       <div className="grid grid-cols-2 gap-3">
         <div className="border border-x-2 border-black rounded-xl col-span-1 text-center">
-        <div className="mt-4 border border-x-2 border-black rounded-xl mx-4">
-        <MyComponent address={formData.address}/>
-        </div>
+          <div className="mt-4 border border-x-2 border-black rounded-xl mx-4">
+            <MyComponent address={formData.address} />
+          </div>
           <div className="mt-4">
             <p className="mb-1">Name:</p>
             <input
@@ -151,11 +158,18 @@ export default function ShoppingCart() {
         <p className="mr-32">
           Total price: {cartItems?.reduce((acc, item) => acc + item.price, 0)} $
         </p>
+        <form className="block">
+          <ReCAPTCHA
+            ref={recaptchaRef}
+            sitekey="6Lf1OksmAAAAAGklw79RH8y_khOFgX9kx5iGFDyo"
+            size="invisible"
+          />
+        </form>
         <button
           className="border border-x-2 border-black rounded-xl py-1 px-8"
           onClick={(e) => handleSubmit(e)}
         >
-          Submit
+          Create order
         </button>
       </div>
     </div>
